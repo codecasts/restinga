@@ -201,3 +201,112 @@ $resource->find('123');
 
 $resource->destroy();
 ```
+
+**Nested Resources**
+All good for an example so far, but real world api has nested objects. That's ok, let's see how to handle it.
+
+Digital Ocean has Domain and Domain Records, let's create those two resources and link them.
+
+Domains:
+
+```php
+<?php namespace Codecasts\DigitalOcean\Resource;
+
+use Codecasts\Restinga\Data\Resource;
+use Codecasts\Restinga\Http\Format\Receive\ReceiveJson;
+use Codecasts\Restinga\Http\Format\Receive\ReceiveJsonErrors;
+use Codecasts\Restinga\Http\Format\Send\SendJson;
+
+class Domain extends Resource
+{
+    use ReceiveJson;
+    use SendJson;
+    use ReceiveJsonErrors;
+
+    protected $service = 'digital-ocean';
+
+    protected $name = 'domains';
+
+    protected $identifier = 'name';
+
+    protected $collection_root = 'domains';
+
+    protected $item_root = 'domain';
+}
+```
+
+DomainRecord:
+```php
+<?php namespace Codecasts\DigitalOcean\Resource;
+
+use Codecasts\Restinga\Data\Resource;
+use Codecasts\Restinga\Http\Format\Receive\ReceiveJson;
+use Codecasts\Restinga\Http\Format\Receive\ReceiveJsonErrors;
+use Codecasts\Restinga\Http\Format\Send\SendJson;
+
+class DomainRecord extends Resource
+{
+    use ReceiveJson;
+    use SendJson;
+    use ReceiveJsonErrors;
+
+    protected $service = 'digital-ocean';
+
+    protected $name = 'records';
+
+    protected $identifier = 'id';
+
+    protected $collection_root = 'records';
+
+    protected $item_root = 'record';
+}
+```
+
+Those two are created but not linked yet, let's do that by creating a `record()` method inside the Domain resource class:
+
+```php
+    public function record()
+    {
+        return $this->childResource(new DomainRecord());
+    }
+```
+
+Now, we can use it this way:
+
+```php
+
+use Codecasts\DigitalOcean\Resource\Domain;
+
+$domain = new Domain();
+
+$domain->find('restinga.dev');
+
+$records = $domain->record()->all();
+
+foreach ($records as $record) {
+    echo $record->id . ' - ' . $record->type. ' - ' . $record->data . "\n";
+}
+//6124929 - NS - ns1.digitalocean.com
+//6124930 - NS - ns2.digitalocean.com
+//6124931 - NS - ns3.digitalocean.com
+//6124932 - A - 123.123.123.123
+```
+
+
+Other method also works the same way, for example, to find and update a record
+
+```php
+use Codecasts\DigitalOcean\Resource\Domain;
+
+$domain = new Domain();
+
+$domain->find('restinga.dev');
+
+$record = $domain->record()->find('6124932');
+
+$record->data = '222.222.222.222';
+
+$record->update();
+```
+
+# NOTICE: Full documentation is about to be writen. Thanks for understanding
