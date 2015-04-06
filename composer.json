@@ -1,0 +1,30 @@
+{
+    "name": "codecasts/restinga",
+    "description": "Easily Create REST API Clients for your PHP Applications",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Diego Hernandes",
+            "email": "diego@codecasts.com.br"
+        },
+        {
+            "name": "Flavio Ferreira",
+            "email": "flavio@codecasts.com.br"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.4.0",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "mashape/unirest-php": "~2.3"
+    },
+    "require-dev": {
+        "phpspec/phpspec": "~2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Codecasts\\Restinga\\": "src/"
+        }
+    }
+}
